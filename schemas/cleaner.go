@@ -6,10 +6,11 @@ import (
 
 type User struct {
 	gorm.Model
-	Name string `json:"name"`
-	Email string `json:"email"`
-	Password string `json:"password"`
-	Role string `json:"role"`
+	Name string
+	Email string
+	Password string
+	Role string
+	Active bool
 }
 
 type UserResponse struct {
@@ -19,4 +20,5 @@ type UserResponse struct {
 	Name string `json:"name"`
 	Email string `json:"email"`
 	Role string `json:"role"`
+	Active bool `json:"active"`
 }
