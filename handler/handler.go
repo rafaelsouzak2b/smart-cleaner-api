@@ -1,13 +1,17 @@
 package handler
 
 import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"github.com/guicazaroto/learning-go/config"
+	"gorm.io/gorm"
 )
 
-func PingHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "pong",
-	})
+var (
+	logger *config.Logger
+	db *gorm.DB
+)
+
+
+func InitializeHandler() {
+	logger = config.GetLogger("handler")
+	db = config.GetSqlite()
 }

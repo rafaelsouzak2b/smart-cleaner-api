@@ -19,10 +19,17 @@ func GetCleanerByIdHandler(c *gin.Context) {
 }
 
 func CreateCleanerHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "cleaner created",
-	})
-}
+	request := CreateUserRequest{}
+
+	c.BindJSON(&request)
+
+	if err := db.Create(&request).Error; err != nil {
+		logger.Errorf("Error on create new cleaner: %v", err.Error())
+		return
+	}
+
+	
+ }
 
 func UpdateCleanerHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
