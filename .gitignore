@@ -16,3 +16,6 @@
 Db folder
 
 db/
+
+vendor
+.env

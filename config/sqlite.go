@@ -32,7 +32,7 @@ func InitializeSqlite() (*gorm.DB, error) {
 	}
 
 	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
-	
+
 	if err != nil {
 		logger.Errorf("Error connecting to database")
 		return nil, err

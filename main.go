@@ -11,10 +11,11 @@ var (
 
 func main() {
 	logger = config.GetLogger("main")
+	config.InitEnvs()
 	err := config.Init()
 	if err != nil {
 		logger.Errorf("Error initializing config")
-		return 
+		return
 	}
 
 	router.Initialize()

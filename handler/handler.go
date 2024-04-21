@@ -7,11 +7,10 @@ import (
 
 var (
 	logger *config.Logger
-	db *gorm.DB
+	db     *gorm.DB
 )
-
 
 func InitializeHandler() {
 	logger = config.GetLogger("handler")
-	db = config.GetSqlite()
+	db = config.GetDb()
 }

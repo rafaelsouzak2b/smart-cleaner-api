@@ -3,23 +3,23 @@ package config
 import "gorm.io/gorm"
 
 var (
-	db *gorm.DB
+	db     *gorm.DB
 	logger *Logger
 )
 
 func Init() error {
 	var err error
-	db, err = InitializeSqlite()
+	db, err = InitializePostgres()
 
 	if err != nil {
-		logger.Errorf("Error initializing sqlite")
+		logger.Errorf("Error initializing db")
 		return err
 	}
 
 	return nil
 }
 
-func GetSqlite() *gorm.DB {
+func GetDb() *gorm.DB {
 	return db
 }
 
