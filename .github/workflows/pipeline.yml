@@ -41,6 +41,8 @@ jobs:
            Dockerrun.aws.json
   deploy:
     runs-on: ubuntu-latest
+    env:
+      ENV: producao
     needs: build
     steps:
       - uses: actions/download-artifact@v3
@@ -50,6 +52,7 @@ jobs:
       - run: |
           sed -i='' "s/<AWS_ACCOUNT_ID>/$AWS_ACCOUNT_ID/" Dockerrun.aws.json
           sed -i='' "s/<PROJECT_NAME>/$PROJECT_NAME/" Dockerrun.aws.json
+          sed -i='' "s/<MODULE_NAME>/$ENV/" Dockerrun.aws.json
           sed -i='' "s/<TAG>/$TAG/" Dockerrun.aws.json
       - uses: actions/setup-python@v2
         with:
