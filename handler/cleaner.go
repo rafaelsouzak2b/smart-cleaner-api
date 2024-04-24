@@ -1,5 +1,7 @@
 package handler
 
+// manter somente coisas relacionadas aos cleaners, ou seja, usuários com Role = cleaner
+
 import (
 	"net/http"
 
