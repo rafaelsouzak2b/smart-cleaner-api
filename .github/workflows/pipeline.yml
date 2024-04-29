@@ -19,11 +19,6 @@ jobs:
       REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
-      with:
-        go-version: 1.22.2
-    - run: go mod vendor
-    - run: CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o "dist/main"
     - run: docker build -t $MODULE_FULLNAME .
     - run: |
         docker tag $MODULE_FULLNAME:$TAG \
@@ -38,27 +33,3 @@ jobs:
         path: |
            .elasticbeanstalk/config.yml
            Dockerrun.aws.json
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: ebconfig
-          path: .
-      - run: |
-          sed -i='' "s/<AWS_ACCOUNT_ID>/$AWS_ACCOUNT_ID/" Dockerrun.aws.json
-          sed -i='' "s/<PROJECT_NAME>/$PROJECT_NAME/" Dockerrun.aws.json
-          sed -i='' "s/<TAG>/$TAG/" Dockerrun.aws.json
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.10'
-      - name: 'Install pip and awsebcli' #workaround: awsebcli não funciona com versões do pyyaml > 5.3
-        run: |
-            sudo wget https://bootstrap.pypa.io/get-pip.py
-            sudo python3 ./get-pip.py
-            sudo pip install "pyyaml<5.4"
-            sudo pip install --upgrade setuptools
-            sudo pip install --upgrade pip awsebcli            
-      - run: |           
-           eb deploy --verbose
