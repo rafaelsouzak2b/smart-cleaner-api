@@ -1,8 +1,8 @@
 branch-defaults:
   default:
-    environment: producao
+    environment: production-api
 environment-defaults:
-  producao:
+  production-api:
     branch: null
     repository: null
 global:
