@@ -9,7 +9,7 @@ import (
 )
 
 func InitializePostgres() (*gorm.DB, error) {
-	dsn := fmt.Sprintf("host=%s user=%s port=%d password=%s dbname=%s sslmode=require", Environment.PostgresHost, Environment.PostgresUser, Environment.PostgresPort, Environment.PostgresPassword, Environment.PostgresDb)
+	dsn := fmt.Sprintf("host=%s user=%s port=%d password=%s dbname=%s", Environment.PostgresHost, Environment.PostgresUser, Environment.PostgresPort, Environment.PostgresPassword, Environment.PostgresDb)
 	fmt.Println(dsn)
 	db, err := gorm.Open(postgres.Open(dsn))
 	if err != nil {
@@ -17,7 +17,7 @@ func InitializePostgres() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	err = db.AutoMigrate(&schemas.User{})
+	err = db.AutoMigrate(&schemas.User{}, &schemas.Cleaner{})
 
 	if err != nil {
 		logger.Errorf("Error migrating database")

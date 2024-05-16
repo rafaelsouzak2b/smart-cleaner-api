@@ -5,21 +5,23 @@ import (
 	"github.com/guicazaroto/learning-go/handler"
 )
 
-func initializeRoutes (router *gin.Engine) {
+func initializeRoutes(router *gin.Engine) {
 	handler.InitializeHandler()
 
 	v1 := router.Group("/api/v1")
 	{
 		v1.GET("/ping", handler.PingHandler)
-		
-		v1.GET("/cleaners", handler.GetCleanerHandler)
 
-		v1.GET("/cleaners/:id", handler.GetCleanerByIdHandler)
+		v1.GET("/cleaner", handler.GetCleanerHandler)
 
-		v1.POST("/cleaners", handler.CreateCleanerHandler)
+		v1.GET("/cleaner/:id", handler.GetCleanerByIdHandler)
 
-		v1.PUT("/cleaners/:id", handler.UpdateCleanerHandler)
+		v1.POST("/cleaner", handler.CreateCleanerHandler)
 
-		v1.DELETE("/cleaners/:id", handler.DeleteCleanerHandler)
+		v1.PUT("/cleaner/:id", handler.UpdateCleanerHandler)
+
+		// v1.DELETE("/cleaners/:id", handler.DeleteCleanerHandler)
+		v1.GET("/user", handler.GetUserHandler)
+		v1.POST("/user", handler.CreateUserHandler)
 	}
 }
