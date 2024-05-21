@@ -15,7 +15,7 @@ type CleanerResponse struct {
 	DataNascimento string    `json:"data_nascimento"`
 	Cep            string    `json:"cep"`
 	Logradouro     string    `json:"logradouro"`
-	Numero         int       `json:"numero"`
+	Numero         string    `json:"numero"`
 	Cidade         string    `json:"cidade"`
 	Uf             string    `json:"uf"`
 	Descricao      string    `json:"descricao"`
