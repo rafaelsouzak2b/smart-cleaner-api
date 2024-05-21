@@ -12,7 +12,7 @@ type CleanerResponse struct {
 	ImagemUrl      string    `json:"imagem_url"`
 	Telefone       string    `json:"telefone"`
 	CPF            string    `json:"cpf"`
-	DataNascimento time.Time `json:"data_nascimento"`
+	DataNascimento string    `json:"data_nascimento"`
 	Cep            string    `json:"cep"`
 	Logradouro     string    `json:"logradouro"`
 	Numero         int       `json:"numero"`

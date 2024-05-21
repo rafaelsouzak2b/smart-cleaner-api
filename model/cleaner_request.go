@@ -2,25 +2,24 @@ package model
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/guicazaroto/learning-go/util"
 )
 
 type CleanerRequest struct {
-	Telefone       string    `json:"telefone"`
-	CPF            string    `json:"cpf"`
-	DataNascimento time.Time `json:"data_nascimento"`
-	Cep            string    `json:"cep"`
-	Logradouro     string    `json:"logradouro"`
-	Numero         int       `json:"numero"`
-	Cidade         string    `json:"cidade"`
-	Uf             string    `json:"uf"`
-	Descricao      string    `json:"descricao"`
-	Name           string    `json:"name"`
-	Email          string    `json:"email"`
-	Password       string    `json:"password"`
-	Active         bool      `json:"active"`
+	Telefone       string `json:"telefone"`
+	CPF            string `json:"cpf"`
+	DataNascimento string `json:"data_nascimento"`
+	Cep            string `json:"cep"`
+	Logradouro     string `json:"logradouro"`
+	Numero         int    `json:"numero"`
+	Cidade         string `json:"cidade"`
+	Uf             string `json:"uf"`
+	Descricao      string `json:"descricao"`
+	Name           string `json:"name"`
+	Email          string `json:"email"`
+	Password       string `json:"password"`
+	Active         bool   `json:"active"`
 }
 
 func (r *CleanerRequest) Validate() error {
