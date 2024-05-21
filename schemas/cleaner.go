@@ -9,10 +9,10 @@ type Cleaner struct {
 	gorm.Model
 	UserId         int64  `gorm:"not null"`
 	UserInfos      User   `gorm:"foreignKey:UserId"`
-	Telefone       string `gorm:"size:11;not null"`
-	CPF            string `gorm:"size:11;not null"`
+	Telefone       string `gorm:"not null"`
+	CPF            string `gorm:"not null"`
 	DataNascimento string `gorm:"not null"`
-	Cep            string `gorm:"size:8;not null"`
+	Cep            string `gorm:"not null"`
 	Logradouro     string `gorm:"size:100;not null"`
 	Numero         string `gorm:"not null"`
 	Cidade         string `gorm:"size:50;not null"`
