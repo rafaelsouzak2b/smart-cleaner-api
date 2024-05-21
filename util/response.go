@@ -1,4 +1,4 @@
-package handler
+package util
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func sendError(ctx *gin.Context, code int, msg string) {
+func SendError(ctx *gin.Context, code int, msg string) {
 	ctx.Header("Content-type", "application/json")
 	ctx.JSON(code, gin.H{
 		"message":   msg,
@@ -15,7 +15,7 @@ func sendError(ctx *gin.Context, code int, msg string) {
 	})
 }
 
-func sendSuccess(ctx *gin.Context, op string, data interface{}) {
+func SendSuccess(ctx *gin.Context, op string, data interface{}) {
 	ctx.Header("Content-type", "application/json")
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": fmt.Sprintf("operation from handler: %s successfull", op),
@@ -23,7 +23,7 @@ func sendSuccess(ctx *gin.Context, op string, data interface{}) {
 	})
 }
 
-func sendCreated(ctx *gin.Context, op string, data interface{}) {
+func SendCreated(ctx *gin.Context, op string, data interface{}) {
 	ctx.Header("Content-type", "application/json")
 	ctx.JSON(http.StatusCreated, gin.H{
 		"message": fmt.Sprintf("operation from handler: %s successfull", op),
@@ -31,12 +31,6 @@ func sendCreated(ctx *gin.Context, op string, data interface{}) {
 	})
 }
 
-// type ErrorResponse struct {
-// 	Message   string `json:"message"`
-// 	ErrorCode string `json:"errorCode"`
-// }
-
-// type CreateUserResponse struct {
-// 	Message string                  `json:"message"`
-// 	Data    schemas.User `json:"data"`
-// }
+func ErrParamIsRequired(name, typ string) error {
+	return fmt.Errorf("param: %s (type: %s) is required", name, typ)
+}

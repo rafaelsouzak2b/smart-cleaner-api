@@ -1,8 +1,10 @@
-package handler
+package model
 
 import (
 	"fmt"
 	"time"
+
+	"github.com/guicazaroto/learning-go/util"
 )
 
 type CleanerRequest struct {
@@ -26,37 +28,37 @@ func (r *CleanerRequest) Validate() error {
 		return fmt.Errorf("request body is empty or malformed")
 	}
 	if r.Name == "" {
-		return errParamIsRequired("name", "string")
+		return util.ErrParamIsRequired("name", "string")
 	}
 	if r.Email == "" {
-		return errParamIsRequired("email", "string")
+		return util.ErrParamIsRequired("email", "string")
 	}
 	if r.Password == "" {
-		return errParamIsRequired("password", "string")
+		return util.ErrParamIsRequired("password", "string")
 	}
 	if r.Telefone == "" {
-		return errParamIsRequired("telefone", "string")
+		return util.ErrParamIsRequired("telefone", "string")
 	}
 	if r.CPF == "" {
-		return errParamIsRequired("cpf", "string")
+		return util.ErrParamIsRequired("cpf", "string")
 	}
 	// if r.DataNascimento == "" {
-	// 	return errParamIsRequired("data_nascimento", "string")
+	// 	return util.ErrParamIsRequired("data_nascimento", "string")
 	// }
 	if r.Cep == "" {
-		return errParamIsRequired("cep", "string")
+		return util.ErrParamIsRequired("cep", "string")
 	}
 	if r.Logradouro == "" {
-		return errParamIsRequired("logradouro", "string")
+		return util.ErrParamIsRequired("logradouro", "string")
 	}
 	if r.Cidade == "" {
-		return errParamIsRequired("cidade", "string")
+		return util.ErrParamIsRequired("cidade", "string")
 	}
 	if r.Uf == "" {
-		return errParamIsRequired("uf", "string")
+		return util.ErrParamIsRequired("uf", "string")
 	}
 	if r.Descricao == "" {
-		return errParamIsRequired("descricao", "string")
+		return util.ErrParamIsRequired("descricao", "string")
 	}
 
 	return nil

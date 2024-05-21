@@ -1,10 +1,10 @@
-package handler
+package model
 
-import "fmt"
+import (
+	"fmt"
 
-func errParamIsRequired(name, typ string) error {
-	return fmt.Errorf("param: %s (type: %s) is required", name, typ)
-}
+	"github.com/guicazaroto/learning-go/util"
+)
 
 type CreateUserRequest struct {
 	Name     string `json:"name"`
@@ -19,16 +19,16 @@ func (r *CreateUserRequest) Validate() error {
 		return fmt.Errorf("request body is empty or malformed")
 	}
 	if r.Role == "" {
-		return errParamIsRequired("role", "string")
+		return util.ErrParamIsRequired("role", "string")
 	}
 	if r.Name == "" {
-		return errParamIsRequired("name", "string")
+		return util.ErrParamIsRequired("name", "string")
 	}
 	if r.Email == "" {
-		return errParamIsRequired("email", "string")
+		return util.ErrParamIsRequired("email", "string")
 	}
 	if r.Password == "" {
-		return errParamIsRequired("password", "string")
+		return util.ErrParamIsRequired("password", "string")
 	}
 
 	return nil

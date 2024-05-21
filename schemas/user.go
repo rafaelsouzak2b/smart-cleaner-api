@@ -6,11 +6,12 @@ import (
 
 type User struct {
 	gorm.Model
-	Name     string
-	Email    string
-	Password string
-	Role     string
-	Active   bool
+	Name      string
+	Email     string
+	Password  string
+	Role      string
+	Active    bool
+	ImagemUrl string
 }
 
 // type UserResponse struct {
