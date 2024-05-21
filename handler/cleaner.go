@@ -147,7 +147,7 @@ func SendImgProfileHandler(c *gin.Context) {
 		util.SendError(c, http.StatusNotFound, "cleaner not found")
 		return
 	}
-	file, err := c.FormFile("image")
+	file, err := c.FormFile("file")
 	if err != nil {
 		util.SendError(c, http.StatusBadRequest, err.Error())
 		return
