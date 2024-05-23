@@ -13,6 +13,7 @@ import (
 	aws_config "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/gin-gonic/gin"
 	"github.com/guicazaroto/learning-go/config"
 	"github.com/guicazaroto/learning-go/model"
@@ -179,6 +180,7 @@ func SendImgProfileHandler(c *gin.Context) {
 		Bucket: aws.String(config.Environment.AwsImgProfileBucket),
 		Key:    aws.String(file.Filename),
 		Body:   openedFile,
+		ACL:    types.ObjectCannedACLPublicRead,
 	})
 
 	if err != nil {
