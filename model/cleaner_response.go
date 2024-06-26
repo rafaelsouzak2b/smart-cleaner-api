@@ -14,8 +14,8 @@ type CleanerResponse struct {
 	//Cep            string    `json:"cep"`
 	//Logradouro     string    `json:"logradouro"`
 	//Numero         string    `json:"numero"`
-	//Cidade         string    `json:"cidade"`
-	//Uf             string    `json:"uf"`
+	Cidade    string `json:"cidade"`
+	Uf        string `json:"uf"`
 	Descricao string `json:"descricao"`
 	//CreatedAt      time.Time `json:"created_at"`
 	//UpdatedAt      time.Time `json:"updated_at"`
