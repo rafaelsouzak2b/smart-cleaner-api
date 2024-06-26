@@ -1,0 +1,937 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>config: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/guicazaroto/learning-go/config/config.go (0.0%)</option>
+				
+				<option value="file1">github.com/guicazaroto/learning-go/config/env.go (0.0%)</option>
+				
+				<option value="file2">github.com/guicazaroto/learning-go/config/logger.go (0.0%)</option>
+				
+				<option value="file3">github.com/guicazaroto/learning-go/config/postgres.go (0.0%)</option>
+				
+				<option value="file4">github.com/guicazaroto/learning-go/config/sqlite.go (0.0%)</option>
+				
+				<option value="file5">github.com/guicazaroto/learning-go/handler/cleaner.go (0.0%)</option>
+				
+				<option value="file6">github.com/guicazaroto/learning-go/handler/handler.go (0.0%)</option>
+				
+				<option value="file7">github.com/guicazaroto/learning-go/handler/health.go (0.0%)</option>
+				
+				<option value="file8">github.com/guicazaroto/learning-go/handler/user.go (0.0%)</option>
+				
+				<option value="file9">github.com/guicazaroto/learning-go/main.go (0.0%)</option>
+				
+				<option value="file10">github.com/guicazaroto/learning-go/model/cleaner_request.go (0.0%)</option>
+				
+				<option value="file11">github.com/guicazaroto/learning-go/model/user_request.go (0.0%)</option>
+				
+				<option value="file12">github.com/guicazaroto/learning-go/router/router.go (0.0%)</option>
+				
+				<option value="file13">github.com/guicazaroto/learning-go/router/routes.go (0.0%)</option>
+				
+				<option value="file14">github.com/guicazaroto/learning-go/schemas/cleaner.go (0.0%)</option>
+				
+				<option value="file15">github.com/guicazaroto/learning-go/util/cors.go (0.0%)</option>
+				
+				<option value="file16">github.com/guicazaroto/learning-go/util/hash.go (0.0%)</option>
+				
+				<option value="file17">github.com/guicazaroto/learning-go/util/response.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package config
+
+import "gorm.io/gorm"
+
+var (
+        db     *gorm.DB
+        logger *Logger
+)
+
+func Init() error <span class="cov0" title="0">{
+        var err error
+        db, err = InitializePostgres()
+
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("Error initializing db")
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func GetDb() *gorm.DB <span class="cov0" title="0">{
+        return db
+}</span>
+
+func GetLogger(p string) *Logger <span class="cov0" title="0">{
+        logger = NewLogger(p)
+        return logger
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package config
+
+import (
+        "log"
+
+        "github.com/codingconcepts/env"
+        "github.com/joho/godotenv"
+)
+
+type environment struct {
+        PostgresHost        string `env:"POSTGRES_HOST" required:"true"`
+        PostgresPort        int    `env:"POSTGRES_PORT" default:"5432"`
+        PostgresUser        string `env:"POSTGRES_USER" required:"true"`
+        PostgresPassword    string `env:"POSTGRES_PASSWORD" required:"true"`
+        PostgresDb          string `env:"POSTGRES_DB" required:"true"`
+        AwsRegion           string `env:"AWS_REGION" required:"true"`
+        AwsImgProfileBucket string `env:"AWS_IMG_PROFILE_BUCKET" required:"true"`
+}
+
+var Environment environment
+
+func InitEnvs() <span class="cov0" title="0">{
+        err := godotenv.Load(".env")
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("Error loading .env file:", err)
+        }</span>
+
+        <span class="cov0" title="0">if err := env.Set(&amp;Environment); err != nil </span><span class="cov0" title="0">{
+                log.Fatal(err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package config
+
+import (
+        "io"
+        "log"
+        "os"
+)
+
+type Logger struct {
+        debug   *log.Logger
+        info    *log.Logger
+        warning *log.Logger
+        err     *log.Logger
+        writer  io.Writer
+}
+
+func NewLogger(p string) *Logger <span class="cov0" title="0">{
+        writer := io.Writer(os.Stdout)
+        logger := log.New(writer, p, log.Ldate|log.Ltime)
+
+        return &amp;Logger{
+                debug:   log.New(writer, "DEBUG: ", logger.Flags()),
+                info:    log.New(writer, "INFO: ", logger.Flags()),
+                warning: log.New(writer, "WARNING: ", logger.Flags()),
+                err:     log.New(writer, "ERROR: ", logger.Flags()),
+                writer:  writer,
+        }
+}</span>
+
+// Create Non-Formatted Logs
+func (l *Logger) Debug(v ...interface{}) <span class="cov0" title="0">{
+        l.debug.Println(v...)
+}</span>
+func (l *Logger) Info(v ...interface{}) <span class="cov0" title="0">{
+        l.info.Println(v...)
+}</span>
+func (l *Logger) Warn(v ...interface{}) <span class="cov0" title="0">{
+        l.warning.Println(v...)
+}</span>
+func (l *Logger) Error(v ...interface{}) <span class="cov0" title="0">{
+        l.err.Println(v...)
+}</span>
+
+// Create Format Enabled Logs
+func (l *Logger) Debugf(format string, v ...interface{}) <span class="cov0" title="0">{
+        l.debug.Printf(format, v...)
+}</span>
+func (l *Logger) Infof(format string, v ...interface{}) <span class="cov0" title="0">{
+        l.info.Printf(format, v...)
+}</span>
+func (l *Logger) Warnf(format string, v ...interface{}) <span class="cov0" title="0">{
+        l.warning.Printf(format, v...)
+}</span>
+func (l *Logger) Errorf(format string, v ...interface{}) <span class="cov0" title="0">{
+        l.err.Printf(format, v...)
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package config
+
+import (
+        "fmt"
+
+        "github.com/guicazaroto/learning-go/schemas"
+        "gorm.io/driver/postgres"
+        "gorm.io/gorm"
+)
+
+func InitializePostgres() (*gorm.DB, error) <span class="cov0" title="0">{
+        dsn := fmt.Sprintf("host=%s user=%s port=%d password=%s dbname=%s", Environment.PostgresHost, Environment.PostgresUser, Environment.PostgresPort, Environment.PostgresPassword, Environment.PostgresDb)
+        fmt.Println(dsn)
+        db, err := gorm.Open(postgres.Open(dsn))
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("Error connecting to database")
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">err = db.AutoMigrate(&amp;schemas.User{}, &amp;schemas.Cleaner{})
+
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("Error migrating database")
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return db, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package config
+
+import (
+        "os"
+
+        "github.com/guicazaroto/learning-go/schemas"
+        "gorm.io/driver/sqlite"
+        "gorm.io/gorm"
+)
+
+func InitializeSqlite() (*gorm.DB, error) <span class="cov0" title="0">{
+        logger := GetLogger("sqlite")
+        dbPath := "./db/smartCleaner.db"
+
+        _, err := os.Stat(dbPath)
+
+        if os.IsNotExist(err) </span><span class="cov0" title="0">{
+                logger.Infof("Database file does not exist, creating it")
+                err = os.MkdirAll("./db", os.ModePerm)
+
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">file, err := os.Create(dbPath)
+
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">file.Close()</span>
+        }
+
+        <span class="cov0" title="0">db, err := gorm.Open(sqlite.Open(dbPath), &amp;gorm.Config{})
+
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("Error connecting to database")
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">err = db.AutoMigrate(&amp;schemas.User{})
+
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("Error migrating database")
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return db, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package handler
+
+// manter somente coisas relacionadas aos cleaners, ou seja, usuários com Role = cleaner
+
+import (
+        "context"
+        "fmt"
+        "net/http"
+        "path/filepath"
+        "strings"
+
+        "github.com/aws/aws-sdk-go-v2/aws"
+        aws_config "github.com/aws/aws-sdk-go-v2/config"
+        "github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+        "github.com/aws/aws-sdk-go-v2/service/s3"
+        "github.com/aws/aws-sdk-go-v2/service/s3/types"
+        "github.com/gin-gonic/gin"
+        "github.com/guicazaroto/learning-go/config"
+        "github.com/guicazaroto/learning-go/model"
+        "github.com/guicazaroto/learning-go/schemas"
+        "github.com/guicazaroto/learning-go/util"
+)
+
+func GetCleanerHandler(c *gin.Context) <span class="cov0" title="0">{
+        var cleaners []schemas.Cleaner
+        db.Preload("UserInfos").Find(&amp;cleaners)
+        if len(cleaners) == 0 </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusNotFound, "cleaners not found")
+                return
+        }</span>
+        <span class="cov0" title="0">cleanersResponse := []model.CleanerResponse{}
+        for _, cleaner := range cleaners </span><span class="cov0" title="0">{
+                cleanersResponse = append(cleanersResponse, cleaner.ToResponse())
+        }</span>
+        <span class="cov0" title="0">util.SendSuccess(c, "get-all-cleaner", cleanersResponse)</span>
+}
+
+func GetCleanerByIdHandler(c *gin.Context) <span class="cov0" title="0">{
+        cleanerID := c.Param("id")
+        var cleaner *schemas.Cleaner
+        result := db.Preload("UserInfos").First(&amp;cleaner, cleanerID)
+        if result.RowsAffected == 0 </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusNotFound, "cleaner not found")
+                return
+        }</span>
+        <span class="cov0" title="0">util.SendSuccess(c, "get-cleaner-by-id", cleaner.ToResponse())</span>
+}
+
+func CreateCleanerHandler(ctx *gin.Context) <span class="cov0" title="0">{
+        request := model.CleanerRequest{}
+
+        if err := ctx.BindJSON(&amp;request); err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("body error: %v", err.Error())
+                util.SendError(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := request.Validate(); err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("validation error: %v", err.Error())
+                util.SendError(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">var cleanerDb schemas.Cleaner
+        result := db.Joins("UserInfos").Where("email = ?", request.Email).First(&amp;cleanerDb)
+        if result.RowsAffected &gt; 0 </span><span class="cov0" title="0">{
+                util.SendError(ctx, http.StatusBadGateway, "already registered cleaner")
+                return
+        }</span>
+
+        <span class="cov0" title="0">cleaner := schemas.Cleaner{
+                UserInfos: schemas.User{
+                        Name:     request.Name,
+                        Email:    request.Email,
+                        Password: util.HashString(request.Password),
+                        Role:     "cleaner",
+                        Active:   request.Active,
+                },
+                Telefone:       request.Telefone,
+                CPF:            request.CPF,
+                DataNascimento: request.DataNascimento,
+                Cep:            request.Cep,
+                Logradouro:     request.Logradouro,
+                Numero:         request.Numero,
+                Cidade:         request.Cidade,
+                Uf:             request.Uf,
+                Descricao:      request.Descricao,
+        }
+
+        if err := db.Create(&amp;cleaner).Error; err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("error creating opening: %v", err.Error())
+                util.SendError(ctx, http.StatusInternalServerError, "error creating opening on database")
+                return
+        }</span>
+
+        <span class="cov0" title="0">util.SendCreated(ctx, "create-cleaner", cleaner.ToResponse())</span>
+
+}
+
+func UpdateCleanerHandler(c *gin.Context) <span class="cov0" title="0">{
+        request := model.CleanerRequest{}
+        cleanerID := c.Param("id")
+        var cleaner schemas.Cleaner
+        if result := db.Preload("UserInfos").First(&amp;cleaner, cleanerID); result.RowsAffected == 0 </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusNotFound, "cleaner not found")
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := c.BindJSON(&amp;request); err != nil </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">cleaner.UserInfos = schemas.User{
+                Name:      request.Name,
+                Email:     request.Email,
+                Active:    request.Active,
+                Role:      cleaner.UserInfos.Role,
+                ImagemUrl: cleaner.UserInfos.ImagemUrl,
+                Password:  cleaner.UserInfos.Password,
+        }
+        cleaner.CPF = request.CPF
+        cleaner.Cep = request.Cep
+        cleaner.Cidade = request.Cidade
+        cleaner.DataNascimento = request.DataNascimento
+        cleaner.Descricao = request.Descricao
+        cleaner.Logradouro = request.Logradouro
+        cleaner.Numero = request.Numero
+        cleaner.Telefone = request.Telefone
+        cleaner.Uf = request.Uf
+
+        result := db.Save(&amp;cleaner)
+        if result.Error != nil </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusInternalServerError, result.Error.Error())
+                return
+        }</span>
+        <span class="cov0" title="0">util.SendSuccess(c, "update-cleaner", cleaner.ToResponse())</span>
+}
+
+func DeleteCleanerHandler(c *gin.Context) <span class="cov0" title="0">{
+        cleanerID := c.Param("id")
+        var cleaner schemas.Cleaner
+        result := db.Unscoped().Delete(&amp;cleaner, cleanerID)
+        if result.Error != nil </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusInternalServerError, result.Error.Error())
+                return
+        }</span>
+        <span class="cov0" title="0">util.SendSuccess(c, "delete-cleaner", "Cleaner deleted successful")</span>
+}
+
+func SendImgProfileHandler(c *gin.Context) <span class="cov0" title="0">{
+        cleanerID := c.Param("id")
+        var cleaner schemas.Cleaner
+        if result := db.Preload("UserInfos").First(&amp;cleaner, cleanerID); result.RowsAffected == 0 </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusNotFound, "cleaner not found")
+                return
+        }</span>
+        <span class="cov0" title="0">file, err := c.FormFile("file")
+        if err != nil </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">ext := strings.ToLower(filepath.Ext(file.Filename))
+
+        if !config.AllowedExtensions[ext] </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusBadRequest, fmt.Sprintf("file type not allowed: %s", ext))
+                return
+        }</span>
+
+        <span class="cov0" title="0">cfg, err := aws_config.LoadDefaultConfig(context.TODO(), aws_config.WithRegion(config.Environment.AwsRegion))
+        if err != nil </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusInternalServerError, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">client := s3.NewFromConfig(cfg)
+        openedFile, err := file.Open()
+        if err != nil </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusInternalServerError, err.Error())
+                return
+        }</span>
+        <span class="cov0" title="0">defer openedFile.Close()
+
+        uploader := manager.NewUploader(client)
+        result, err := uploader.Upload(context.TODO(), &amp;s3.PutObjectInput{
+                Bucket: aws.String(config.Environment.AwsImgProfileBucket),
+                Key:    aws.String(file.Filename),
+                Body:   openedFile,
+                ACL:    types.ObjectCannedACLPublicRead,
+        })
+
+        if err != nil </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusInternalServerError, err.Error())
+                return
+        }</span>
+        <span class="cov0" title="0">resultUpdate := db.Model(&amp;cleaner.UserInfos).Update("ImagemUrl", result.Location)
+        if resultUpdate.Error != nil </span><span class="cov0" title="0">{
+                util.SendError(c, http.StatusInternalServerError, resultUpdate.Error.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">util.SendSuccess(c, "send-img-cleaner", gin.H{"message": "File uploaded successfully", "location": result.Location})</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package handler
+
+import (
+        "github.com/guicazaroto/learning-go/config"
+        "gorm.io/gorm"
+)
+
+var (
+        logger *config.Logger
+        db     *gorm.DB
+)
+
+func InitializeHandler() <span class="cov0" title="0">{
+        logger = config.GetLogger("handler")
+        db = config.GetDb()
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package handler
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+func PingHandler(c *gin.Context) <span class="cov0" title="0">{
+        c.JSON(http.StatusOK, gin.H{
+                "message": "pong",
+        })
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package handler
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+        "github.com/guicazaroto/learning-go/model"
+        "github.com/guicazaroto/learning-go/schemas"
+        "github.com/guicazaroto/learning-go/util"
+)
+
+func GetUserHandler(c *gin.Context) <span class="cov0" title="0">{
+        var users []schemas.User
+        db.Find(&amp;users, "Role = ?", "user")
+        util.SendSuccess(c, "user", users)
+}</span>
+
+// func GetUserByIdHandler(c *gin.Context) {
+//         c.JSON(http.StatusOK, gin.H{
+//                 "message": "user",
+//         })
+// }
+
+func CreateUserHandler(ctx *gin.Context) <span class="cov0" title="0">{
+        request := model.CreateUserRequest{}
+
+        if err := ctx.BindJSON(&amp;request); err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("body error: %v", err.Error())
+                util.SendError(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := request.Validate(); err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("validation error: %v", err.Error())
+                util.SendError(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">user := schemas.User{
+                Role:     request.Role,
+                Name:     request.Name,
+                Email:    request.Email,
+                Password: request.Password,
+                Active:   request.Active,
+        }
+
+        if err := db.Create(&amp;user).Error; err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("error creating opening: %v", err.Error())
+                util.SendError(ctx, http.StatusInternalServerError, "error creating opening on database")
+                return
+        }</span>
+
+        <span class="cov0" title="0">util.SendCreated(ctx, "user", user)</span>
+}
+
+// func UpdateUserHandler(c *gin.Context) {
+//         c.JSON(http.StatusOK, gin.H{
+//                 "message": "user updated",
+//         })
+// }
+
+// func DeleteUserHandler(c *gin.Context) {
+//         c.JSON(http.StatusOK, gin.H{
+//                 "message": "user deleted",
+//         })
+//}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package main
+
+import (
+        "github.com/guicazaroto/learning-go/config"
+        "github.com/guicazaroto/learning-go/router"
+)
+
+var (
+        logger *config.Logger
+)
+
+func main() <span class="cov0" title="0">{
+        logger = config.GetLogger("main")
+        config.InitEnvs()
+        err := config.Init()
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Errorf("Error initializing config")
+                return
+        }</span>
+
+        <span class="cov0" title="0">router.Initialize()</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package model
+
+import (
+        "fmt"
+
+        "github.com/guicazaroto/learning-go/util"
+)
+
+type CleanerRequest struct {
+        Telefone       string `json:"telefone"`
+        CPF            string `json:"cpf"`
+        DataNascimento string `json:"data_nascimento"`
+        Cep            string `json:"cep"`
+        Logradouro     string `json:"logradouro"`
+        Numero         string `json:"numero"`
+        Cidade         string `json:"cidade"`
+        Uf             string `json:"uf"`
+        Descricao      string `json:"descricao"`
+        Name           string `json:"name"`
+        Email          string `json:"email"`
+        Password       string `json:"password"`
+        Active         bool   `json:"active"`
+}
+
+func (r *CleanerRequest) Validate() error <span class="cov0" title="0">{
+        if r.Name == "" &amp;&amp; r.Email == "" &amp;&amp; r.Password == "" </span><span class="cov0" title="0">{
+                return fmt.Errorf("request body is empty or malformed")
+        }</span>
+        <span class="cov0" title="0">if r.Name == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("name", "string")
+        }</span>
+        <span class="cov0" title="0">if r.Email == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("email", "string")
+        }</span>
+        <span class="cov0" title="0">if r.Password == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("password", "string")
+        }</span>
+        <span class="cov0" title="0">if r.Telefone == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("telefone", "string")
+        }</span>
+        <span class="cov0" title="0">if r.CPF == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("cpf", "string")
+        }</span>
+        // if r.DataNascimento == "" {
+        //         return util.ErrParamIsRequired("data_nascimento", "string")
+        // }
+        <span class="cov0" title="0">if r.Cep == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("cep", "string")
+        }</span>
+        <span class="cov0" title="0">if r.Logradouro == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("logradouro", "string")
+        }</span>
+        <span class="cov0" title="0">if r.Cidade == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("cidade", "string")
+        }</span>
+        <span class="cov0" title="0">if r.Uf == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("uf", "string")
+        }</span>
+        <span class="cov0" title="0">if r.Descricao == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("descricao", "string")
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package model
+
+import (
+        "fmt"
+
+        "github.com/guicazaroto/learning-go/util"
+)
+
+type CreateUserRequest struct {
+        Name     string `json:"name"`
+        Email    string `json:"email"`
+        Password string `json:"password"`
+        Role     string `json:"role"`
+        Active   bool   `json:"active"`
+}
+
+func (r *CreateUserRequest) Validate() error <span class="cov0" title="0">{
+        if r.Name == "" &amp;&amp; r.Role == "" &amp;&amp; r.Email == "" &amp;&amp; r.Password == "" </span><span class="cov0" title="0">{
+                return fmt.Errorf("request body is empty or malformed")
+        }</span>
+        <span class="cov0" title="0">if r.Role == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("role", "string")
+        }</span>
+        <span class="cov0" title="0">if r.Name == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("name", "string")
+        }</span>
+        <span class="cov0" title="0">if r.Email == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("email", "string")
+        }</span>
+        <span class="cov0" title="0">if r.Password == "" </span><span class="cov0" title="0">{
+                return util.ErrParamIsRequired("password", "string")
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package router
+
+import (
+        "github.com/gin-gonic/gin"
+        "github.com/guicazaroto/learning-go/util"
+)
+
+func Initialize() <span class="cov0" title="0">{
+        r := gin.Default()
+        r.Use(util.CORSMiddleware())
+
+        initializeRoutes(r)
+        r.Run()
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package router
+
+import (
+        "github.com/gin-gonic/gin"
+        "github.com/guicazaroto/learning-go/handler"
+)
+
+func initializeRoutes(router *gin.Engine) <span class="cov0" title="0">{
+        handler.InitializeHandler()
+
+        v1 := router.Group("/api/v1")
+        </span><span class="cov0" title="0">{
+                v1.GET("/ping", handler.PingHandler)
+                v1.GET("/cleaner", handler.GetCleanerHandler)
+                v1.GET("/cleaner/:id", handler.GetCleanerByIdHandler)
+                v1.POST("/cleaner", handler.CreateCleanerHandler)
+                v1.PUT("/cleaner/:id", handler.UpdateCleanerHandler)
+                v1.DELETE("/cleaner/:id", handler.DeleteCleanerHandler)
+                v1.POST("/cleaner/:id/img", handler.SendImgProfileHandler)
+
+                // v1.GET("/user", handler.GetUserHandler)
+                // v1.POST("/user", handler.CreateUserHandler)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package schemas
+
+import (
+        "github.com/guicazaroto/learning-go/model"
+        "gorm.io/gorm"
+)
+
+type Cleaner struct {
+        gorm.Model
+        UserId         int64  `gorm:"not null"`
+        UserInfos      User   `gorm:"foreignKey:UserId"`
+        Telefone       string `gorm:"not null"`
+        CPF            string `gorm:"not null"`
+        DataNascimento string `gorm:"not null"`
+        Cep            string `gorm:"not null"`
+        Logradouro     string `gorm:"size:100;not null"`
+        Numero         string `gorm:"not null"`
+        Cidade         string `gorm:"size:50;not null"`
+        Uf             string `gorm:"size:2;not null"`
+        Descricao      string `gorm:"size:200;not null"`
+}
+
+func (c *Cleaner) ToResponse() model.CleanerResponse <span class="cov0" title="0">{
+        return model.CleanerResponse{
+                Id:             int64(c.ID),
+                Name:           c.UserInfos.Name,
+                Email:          c.UserInfos.Email,
+                Active:         c.UserInfos.Active,
+                ImagemUrl:      c.UserInfos.ImagemUrl,
+                Telefone:       c.Telefone,
+                CPF:            c.CPF,
+                DataNascimento: c.DataNascimento,
+                Cep:            c.CPF,
+                Logradouro:     c.Logradouro,
+                Numero:         c.Numero,
+                Cidade:         c.Cidade,
+                Uf:             c.Uf,
+                Descricao:      c.Descricao,
+                CreatedAt:      c.CreatedAt,
+                UpdatedAt:      c.UpdatedAt,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package util
+
+import "github.com/gin-gonic/gin"
+
+func CORSMiddleware() gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+                c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+                c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+                c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+
+                if c.Request.Method == "OPTIONS" </span><span class="cov0" title="0">{
+                        c.AbortWithStatus(204)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">c.Next()</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package util
+
+import (
+        "crypto/sha256"
+        "fmt"
+)
+
+func HashString(str string) string <span class="cov0" title="0">{
+        data := []byte(str)
+
+        hasher := sha256.New()
+
+        hasher.Write(data)
+
+        hash := hasher.Sum(nil)
+
+        return fmt.Sprintf("%x", hash)
+}</span>
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package util
+
+import (
+        "fmt"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+func SendError(ctx *gin.Context, code int, msg string) <span class="cov0" title="0">{
+        ctx.Header("Content-type", "application/json")
+        ctx.JSON(code, gin.H{
+                "message":   msg,
+                "errorCode": code,
+        })
+}</span>
+
+func SendSuccess(ctx *gin.Context, op string, data interface{}) <span class="cov0" title="0">{
+        ctx.Header("Content-type", "application/json")
+        ctx.JSON(http.StatusOK, gin.H{
+                "message": fmt.Sprintf("operation from handler: %s successfull", op),
+                "data":    data,
+        })
+}</span>
+
+func SendCreated(ctx *gin.Context, op string, data interface{}) <span class="cov0" title="0">{
+        ctx.Header("Content-type", "application/json")
+        ctx.JSON(http.StatusCreated, gin.H{
+                "message": fmt.Sprintf("operation from handler: %s successfull", op),
+                "data":    data,
+        })
+}</span>
+
+func ErrParamIsRequired(name, typ string) error <span class="cov0" title="0">{
+        return fmt.Errorf("param: %s (type: %s) is required", name, typ)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

@@ -7,10 +7,11 @@ import (
 
 type Cleaner struct {
 	gorm.Model
+	Id             int64
 	UserId         int64  `gorm:"not null"`
 	UserInfos      User   `gorm:"foreignKey:UserId"`
 	Telefone       string `gorm:"not null"`
-	CPF            string `gorm:"not null"`
+	CPF            string `gorm:"not null,unique"`
 	DataNascimento string `gorm:"not null"`
 	Cep            string `gorm:"not null"`
 	Logradouro     string `gorm:"size:100;not null"`
@@ -22,10 +23,30 @@ type Cleaner struct {
 
 func (c *Cleaner) ToResponse() model.CleanerResponse {
 	return model.CleanerResponse{
-		Id:             int64(c.ID),
+		Id:    c.Id,
+		Name:  c.UserInfos.Name,
+		Email: c.UserInfos.Email,
+		//Active:         c.UserInfos.Active,
+		ImagemUrl: c.UserInfos.ImagemUrl,
+		//Telefone:       c.Telefone,
+		//CPF:            c.CPF,
+		//DataNascimento: c.DataNascimento,
+		//Cep:            c.CPF,
+		//Logradouro:     c.Logradouro,
+		//Numero:         c.Numero,
+		//Cidade:         c.Cidade,
+		//Uf:             c.Uf,
+		//Descricao:      c.Descricao,
+		//CreatedAt:      c.CreatedAt,
+		//UpdatedAt:      c.UpdatedAt,
+	}
+}
+
+func (c *Cleaner) ToResponseMe() model.CleanerMeResponse {
+	return model.CleanerMeResponse{
+		Id:             c.Id,
 		Name:           c.UserInfos.Name,
 		Email:          c.UserInfos.Email,
-		Active:         c.UserInfos.Active,
 		ImagemUrl:      c.UserInfos.ImagemUrl,
 		Telefone:       c.Telefone,
 		CPF:            c.CPF,
@@ -37,6 +58,5 @@ func (c *Cleaner) ToResponse() model.CleanerResponse {
 		Uf:             c.Uf,
 		Descricao:      c.Descricao,
 		CreatedAt:      c.CreatedAt,
-		UpdatedAt:      c.UpdatedAt,
 	}
 }

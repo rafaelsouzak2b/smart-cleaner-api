@@ -15,6 +15,8 @@ type environment struct {
 	PostgresDb          string `env:"POSTGRES_DB" required:"true"`
 	AwsRegion           string `env:"AWS_REGION" required:"true"`
 	AwsImgProfileBucket string `env:"AWS_IMG_PROFILE_BUCKET" required:"true"`
+	DefaultToken        string `env:"DEFAULT_TOKEN" required:"true"`
+	CleanerToken        string `env:"CLEANER_TOKEN" required:"true"`
 }
 
 var Environment environment

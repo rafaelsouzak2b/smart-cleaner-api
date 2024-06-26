@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/guicazaroto/learning-go/config"
 	"github.com/guicazaroto/learning-go/handler"
 )
 
@@ -11,14 +12,15 @@ func initializeRoutes(router *gin.Engine) {
 	v1 := router.Group("/api/v1")
 	{
 		v1.GET("/ping", handler.PingHandler)
-		v1.GET("/cleaner", handler.GetCleanerHandler)
-		v1.GET("/cleaner/:id", handler.GetCleanerByIdHandler)
-		v1.POST("/cleaner", handler.CreateCleanerHandler)
-		v1.PUT("/cleaner/:id", handler.UpdateCleanerHandler)
-		v1.DELETE("/cleaner/:id", handler.DeleteCleanerHandler)
-		v1.POST("/cleaner/:id/img", handler.SendImgProfileHandler)
+		v1.GET("/cleaner/search", config.AuthTokenMiddleware(), handler.GetCleanerHandler)
+		v1.GET("/cleaner", config.JWTMiddleware("cleaner"), handler.GetCleanerByIdHandler)
+		v1.GET("/cleaner/me", config.JWTMiddleware("cleaner"), handler.GetCleanerMeByIdHandler)
+		v1.POST("/cleaner", config.AuthTokenMiddleware(), handler.CreateCleanerHandler)
+		v1.PUT("/cleaner", config.JWTMiddleware("cleaner"), handler.UpdateCleanerHandler)
+		v1.DELETE("/cleaner", config.JWTMiddleware("cleaner"), handler.DeleteCleanerHandler)
+		v1.POST("/cleaner/login", config.AuthTokenMiddleware(), handler.LoginCleanerHandler)
+		v1.POST("/cleaner/img", config.JWTMiddleware("cleaner"), handler.SendImgProfileHandler)
+		v1.PATCH("/cleaner/img", config.JWTMiddleware("cleaner"), handler.UpdateImgProfileHandler)
 
-		// v1.GET("/user", handler.GetUserHandler)
-		// v1.POST("/user", handler.CreateUserHandler)
 	}
 }
