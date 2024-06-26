@@ -36,7 +36,7 @@ func (c *Cleaner) ToResponse() model.CleanerResponse {
 		//Numero:         c.Numero,
 		//Cidade:         c.Cidade,
 		//Uf:             c.Uf,
-		//Descricao:      c.Descricao,
+		Descricao: c.Descricao,
 		//CreatedAt:      c.CreatedAt,
 		//UpdatedAt:      c.UpdatedAt,
 	}
