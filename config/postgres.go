@@ -17,7 +17,7 @@ func InitializePostgres() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	err = db.AutoMigrate(&schemas.User{}, &schemas.Cleaner{})
+	err = db.AutoMigrate(&schemas.User{}, &schemas.Cleaner{}, &schemas.Message{})
 
 	if err != nil {
 		logger.Errorf("Error migrating database")

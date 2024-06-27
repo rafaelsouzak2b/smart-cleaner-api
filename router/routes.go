@@ -22,5 +22,8 @@ func initializeRoutes(router *gin.Engine) {
 		v1.POST("/cleaner/:id/img", config.AuthTokenMiddleware(), handler.SendImgProfileHandler)
 		v1.PATCH("/cleaner/img", config.JWTMiddleware("cleaner"), handler.UpdateImgProfileHandler)
 
+		v1.GET("/cleaner/message", config.JWTMiddleware("cleaner"), handler.GetMessageHandler)
+		v1.POST("/cleaner/message/:id", config.AuthTokenMiddleware(), handler.CreateMessageHandler)
+
 	}
 }
