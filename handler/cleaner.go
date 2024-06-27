@@ -167,9 +167,9 @@ func DeleteCleanerHandler(c *gin.Context) {
 }
 
 func SendImgProfileHandler(c *gin.Context) {
-	cleanerID := c.Param("id")
+	userID := c.Param("id")
 	var cleaner schemas.Cleaner
-	if result := db.Preload("UserInfos").First(&cleaner, cleanerID); result.RowsAffected == 0 {
+	if result := db.Preload("UserInfos").Where("user_id = ?", userID).First(&cleaner); result.RowsAffected == 0 {
 		util.SendError(c, http.StatusNotFound, "cleaner not found")
 		return
 	}
