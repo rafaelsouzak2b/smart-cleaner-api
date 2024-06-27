@@ -133,7 +133,7 @@ func UpdateCleanerHandler(c *gin.Context) {
 
 	cleaner.UserInfos = schemas.User{
 		Name:      request.Name,
-		Active:    request.Active,
+		Active:    cleaner.UserInfos.Active,
 		Role:      cleaner.UserInfos.Role,
 		ImagemUrl: cleaner.UserInfos.ImagemUrl,
 		Password:  cleaner.UserInfos.Password,
