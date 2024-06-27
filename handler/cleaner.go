@@ -44,7 +44,7 @@ func GetCleanerHandler(c *gin.Context) {
 }
 
 func GetCleanerByIdHandler(c *gin.Context) {
-	cleanerID := c.MustGet("id").(string)
+	cleanerID := c.Param("id")
 	var cleaner *schemas.Cleaner
 	result := db.Preload("UserInfos").First(&cleaner, cleanerID)
 	if result.RowsAffected == 0 {

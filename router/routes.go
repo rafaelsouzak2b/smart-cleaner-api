@@ -13,7 +13,7 @@ func initializeRoutes(router *gin.Engine) {
 	{
 		v1.GET("/ping", handler.PingHandler)
 		v1.GET("/cleaner/search", config.AuthTokenMiddleware(), handler.GetCleanerHandler)
-		v1.GET("/cleaner", config.JWTMiddleware("cleaner"), handler.GetCleanerByIdHandler)
+		v1.GET("/cleaner/:id", config.AuthTokenMiddleware(), handler.GetCleanerByIdHandler)
 		v1.GET("/cleaner/me", config.JWTMiddleware("cleaner"), handler.GetCleanerMeByIdHandler)
 		v1.POST("/cleaner", config.AuthTokenMiddleware(), handler.CreateCleanerHandler)
 		v1.PUT("/cleaner", config.JWTMiddleware("cleaner"), handler.UpdateCleanerHandler)
