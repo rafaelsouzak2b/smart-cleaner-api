@@ -7,5 +7,11 @@
     {
       "ContainerPort": "5555"
     }
+  ],
+  "environment": [
+    {
+      "name": "SECRET_KEY",
+      "value": "mysecretkey"
+    }
   ]
 }
