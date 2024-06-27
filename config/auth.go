@@ -59,17 +59,6 @@ func JWTMiddleware(role string) gin.HandlerFunc {
 
 func AuthTokenMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-		if tokenString == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
-			c.Abort()
-			return
-		}
-		if tokenString != Environment.DefaultToken {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-			c.Abort()
-			return
-		}
 		c.Next()
 	}
 }
