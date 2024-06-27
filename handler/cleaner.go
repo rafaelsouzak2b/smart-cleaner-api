@@ -168,12 +168,12 @@ func DeleteCleanerHandler(c *gin.Context) {
 
 func SendImgProfileHandler(c *gin.Context) {
 	userID := c.Param("id")
-	var cleaner schemas.Cleaner
-	if result := db.Preload("UserInfos").Where("user_id = ?", userID).First(&cleaner); result.RowsAffected == 0 {
-		util.SendError(c, http.StatusNotFound, "cleaner not found")
+	var user schemas.User
+	if result := db.First(&user, userID); result.RowsAffected == 0 {
+		util.SendError(c, http.StatusNotFound, "user not found")
 		return
 	}
-	if cleaner.UserInfos.ImagemUrl != "" {
+	if user.ImagemUrl != "" {
 		util.SendError(c, http.StatusBadRequest, "image already sent")
 		return
 	}
@@ -216,20 +216,20 @@ func SendImgProfileHandler(c *gin.Context) {
 		util.SendError(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	resultUpdate := db.Model(&cleaner.UserInfos).Update("ImagemUrl", result.Location)
+	resultUpdate := db.Model(&user).Update("ImagemUrl", result.Location)
 	if resultUpdate.Error != nil {
 		util.SendError(c, http.StatusInternalServerError, resultUpdate.Error.Error())
 		return
 	}
 
-	util.SendSuccess(c, "send-img-cleaner", gin.H{"message": "File uploaded successfully", "location": result.Location})
+	util.SendSuccess(c, "send-img-user", gin.H{"message": "File uploaded successfully", "location": result.Location})
 }
 
 func UpdateImgProfileHandler(c *gin.Context) {
-	cleanerID := c.MustGet("id").(string)
-	var cleaner schemas.Cleaner
-	if result := db.Preload("UserInfos").First(&cleaner, cleanerID); result.RowsAffected == 0 {
-		util.SendError(c, http.StatusNotFound, "cleaner not found")
+	userID := c.Param("id")
+	var user schemas.User
+	if result := db.First(&user, userID); result.RowsAffected == 0 {
+		util.SendError(c, http.StatusNotFound, "user not found")
 		return
 	}
 	file, err := c.FormFile("file")
@@ -271,13 +271,13 @@ func UpdateImgProfileHandler(c *gin.Context) {
 		util.SendError(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	resultUpdate := db.Model(&cleaner.UserInfos).Update("ImagemUrl", result.Location)
+	resultUpdate := db.Model(&user).Update("ImagemUrl", result.Location)
 	if resultUpdate.Error != nil {
 		util.SendError(c, http.StatusInternalServerError, resultUpdate.Error.Error())
 		return
 	}
 
-	util.SendSuccess(c, "update-img-cleaner", gin.H{"message": "File uploaded successfully", "location": result.Location})
+	util.SendSuccess(c, "update-img-user", gin.H{"message": "File uploaded successfully", "location": result.Location})
 }
 
 func LoginCleanerHandler(c *gin.Context) {
