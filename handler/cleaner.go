@@ -1,13 +1,12 @@
 package handler
 
-// manter somente coisas relacionadas aos cleaners, ou seja, usuários com Role = cleaner
-
 import (
 	"context"
 	"fmt"
 	"net/http"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	aws_config "github.com/aws/aws-sdk-go-v2/config"
@@ -15,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/guicazaroto/learning-go/config"
 	"github.com/guicazaroto/learning-go/model"
 	"github.com/guicazaroto/learning-go/schemas"
@@ -27,9 +27,9 @@ func GetCleanerHandler(c *gin.Context) {
 	city := c.Query("city")
 
 	if city != "" {
-		db.Preload("UserInfos").Where("cidade = ?", city).Find(&cleaners)
+		db.Joins("UserInfos").Where("active = ?", true).Where("cidade = ?", city).Find(&cleaners)
 	} else {
-		db.Preload("UserInfos").Find(&cleaners)
+		db.Joins("UserInfos").Where("active = ?", true).Find(&cleaners)
 	}
 
 	if len(cleaners) == 0 {
@@ -138,6 +138,7 @@ func UpdateCleanerHandler(c *gin.Context) {
 		ImagemUrl: cleaner.UserInfos.ImagemUrl,
 		Password:  cleaner.UserInfos.Password,
 		Email:     cleaner.UserInfos.Email,
+		Model:     cleaner.Model,
 	}
 	cleaner.Cep = request.Cep
 	cleaner.Cidade = request.Cidade
@@ -173,6 +174,10 @@ func SendImgProfileHandler(c *gin.Context) {
 		util.SendError(c, http.StatusNotFound, "cleaner not found")
 		return
 	}
+	if cleaner.UserInfos.ImagemUrl != "" {
+		util.SendError(c, http.StatusBadRequest, "image already sent")
+		return
+	}
 	file, err := c.FormFile("file")
 	if err != nil {
 		util.SendError(c, http.StatusBadRequest, err.Error())
@@ -200,10 +205,12 @@ func SendImgProfileHandler(c *gin.Context) {
 	}
 	defer openedFile.Close()
 
+	fileName := fmt.Sprintf("%s%s", uuid.New().String(), ext)
+
 	uploader := manager.NewUploader(client)
 	result, err := uploader.Upload(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(config.Environment.AwsImgProfileBucket),
-		Key:    aws.String(file.Filename),
+		Key:    aws.String(fileName),
 		Body:   openedFile,
 		ACL:    types.ObjectCannedACLPublicRead,
 	})
@@ -222,7 +229,7 @@ func SendImgProfileHandler(c *gin.Context) {
 }
 
 func UpdateImgProfileHandler(c *gin.Context) {
-	cleanerID := c.Param("id")
+	cleanerID := c.MustGet("id").(string)
 	var cleaner schemas.Cleaner
 	if result := db.Preload("UserInfos").First(&cleaner, cleanerID); result.RowsAffected == 0 {
 		util.SendError(c, http.StatusNotFound, "cleaner not found")
@@ -255,10 +262,34 @@ func UpdateImgProfileHandler(c *gin.Context) {
 	}
 	defer openedFile.Close()
 
+	fileUrl := strings.Split(cleaner.UserInfos.ImagemUrl, "/")
+	fileName := fileUrl[len(fileUrl)-1]
+
+	_, err = client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
+		Bucket: aws.String(config.Environment.AwsImgProfileBucket),
+		Key:    aws.String(fileName),
+	})
+	if err != nil {
+		util.SendError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	waiter := s3.NewObjectNotExistsWaiter(client)
+	err = waiter.Wait(context.TODO(), &s3.HeadObjectInput{
+		Bucket: aws.String(config.Environment.AwsImgProfileBucket),
+		Key:    aws.String(fileName),
+	}, *aws.Duration(time.Minute * 1))
+	if err != nil {
+		util.SendError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	fileName = fmt.Sprintf("%s%s", uuid.New().String(), ext)
+
 	uploader := manager.NewUploader(client)
 	result, err := uploader.Upload(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(config.Environment.AwsImgProfileBucket),
-		Key:    aws.String(file.Filename),
+		Key:    aws.String(fileName),
 		Body:   openedFile,
 		ACL:    types.ObjectCannedACLPublicRead,
 	})
@@ -287,7 +318,7 @@ func LoginCleanerHandler(c *gin.Context) {
 	}
 	fmt.Println(util.HashString(creds.Password))
 	var cleanerDb schemas.Cleaner
-	result := db.Joins("UserInfos").Where("email = ?", creds.Email).Where("password = ?", util.HashString(creds.Password)).First(&cleanerDb)
+	result := db.Joins("UserInfos").Where("active = ?", true).Where("email = ?", creds.Email).Where("password = ?", util.HashString(creds.Password)).First(&cleanerDb)
 	if result.RowsAffected == 0 {
 		util.SendError(c, http.StatusUnauthorized, "Unauthorized")
 		return

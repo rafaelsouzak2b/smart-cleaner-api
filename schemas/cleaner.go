@@ -23,22 +23,14 @@ type Cleaner struct {
 
 func (c *Cleaner) ToResponse() model.CleanerResponse {
 	return model.CleanerResponse{
-		Id:    c.Id,
-		Name:  c.UserInfos.Name,
-		Email: c.UserInfos.Email,
-		//Active:         c.UserInfos.Active,
+		Id:        c.Id,
+		Name:      c.UserInfos.Name,
+		Email:     c.UserInfos.Email,
 		ImagemUrl: c.UserInfos.ImagemUrl,
-		//Telefone:       c.Telefone,
-		//CPF:            c.CPF,
-		//DataNascimento: c.DataNascimento,
-		//Cep:            c.CPF,
-		//Logradouro:     c.Logradouro,
-		//Numero:         c.Numero,
+		Telefone:  c.Telefone,
 		Cidade:    c.Cidade,
 		Uf:        c.Uf,
 		Descricao: c.Descricao,
-		//CreatedAt:      c.CreatedAt,
-		//UpdatedAt:      c.UpdatedAt,
 	}
 }
 
