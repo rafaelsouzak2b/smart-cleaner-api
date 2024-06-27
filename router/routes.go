@@ -19,7 +19,7 @@ func initializeRoutes(router *gin.Engine) {
 		v1.PUT("/cleaner", config.JWTMiddleware("cleaner"), handler.UpdateCleanerHandler)
 		v1.DELETE("/cleaner", config.JWTMiddleware("cleaner"), handler.DeleteCleanerHandler)
 		v1.POST("/cleaner/login", config.AuthTokenMiddleware(), handler.LoginCleanerHandler)
-		v1.POST("/cleaner/img", config.JWTMiddleware("cleaner"), handler.SendImgProfileHandler)
+		v1.POST("/cleaner/:id/img", config.AuthTokenMiddleware(), handler.SendImgProfileHandler)
 		v1.PATCH("/cleaner/img", config.JWTMiddleware("cleaner"), handler.UpdateImgProfileHandler)
 
 	}
