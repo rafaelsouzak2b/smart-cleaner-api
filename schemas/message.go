@@ -12,6 +12,8 @@ type Message struct {
 	Cleaner   Cleaner `gorm:"foreignKey:CleanerId"`
 	Message   string  `gorm:"size:1000;not null"`
 	Telefone  string  `gorm:"not null"`
+	Nome      string  `gorm:"size:150;not null"`
+	Email     string  `gorm:"not null"`
 }
 
 func (m *Message) ToResponse() model.MessageResponse {
@@ -20,5 +22,7 @@ func (m *Message) ToResponse() model.MessageResponse {
 		Message:   m.Message,
 		Telefone:  m.Telefone,
 		CreatedAt: m.CreatedAt,
+		Nome:      m.Nome,
+		Email:     m.Email,
 	}
 }
