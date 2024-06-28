@@ -48,6 +48,8 @@ func CreateMessageHandler(ctx *gin.Context) {
 		CleanerId: cleaner.Id,
 		Message:   request.Message,
 		Telefone:  request.Telefone,
+		Nome:      request.Nome,
+		Email:     request.Email,
 	}
 
 	if err := db.Create(&message).Error; err != nil {
