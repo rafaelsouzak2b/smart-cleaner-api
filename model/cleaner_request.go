@@ -1,8 +1,6 @@
 package model
 
 import (
-	"fmt"
-
 	"github.com/guicazaroto/learning-go/util"
 )
 
@@ -23,9 +21,6 @@ type CleanerRequest struct {
 }
 
 func (r *CleanerRequest) Validate() error {
-	if r.Name == "" && r.Email == "" && r.Password == "" {
-		return fmt.Errorf("request body is empty or malformed")
-	}
 	if r.Name == "" {
 		return util.ErrParamIsRequired("name", "string")
 	}
@@ -41,9 +36,6 @@ func (r *CleanerRequest) Validate() error {
 	if r.CPF == "" {
 		return util.ErrParamIsRequired("cpf", "string")
 	}
-	// if r.DataNascimento == "" {
-	// 	return util.ErrParamIsRequired("data_nascimento", "string")
-	// }
 	if r.Cep == "" {
 		return util.ErrParamIsRequired("cep", "string")
 	}

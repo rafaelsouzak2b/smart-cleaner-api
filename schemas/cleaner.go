@@ -43,7 +43,7 @@ func (c *Cleaner) ToResponseMe() model.CleanerMeResponse {
 		Telefone:       c.Telefone,
 		CPF:            c.CPF,
 		DataNascimento: c.DataNascimento,
-		Cep:            c.CPF,
+		Cep:            c.Cep,
 		Logradouro:     c.Logradouro,
 		Numero:         c.Numero,
 		Cidade:         c.Cidade,
