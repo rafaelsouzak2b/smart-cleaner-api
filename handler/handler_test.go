@@ -94,7 +94,7 @@ func TestCleanerHandler(t *testing.T) {
 			response := Response{}
 			json.Unmarshal([]byte(resp.Body.String()), &response)
 			assert.Equal(t, http.StatusOK, resp.Code)
-			assert.Len(t, response.Data, 1)
+			assert.Len(t, response.Data, 2)
 		})
 		t.Run("Dont return Cleaners", func(t *testing.T) {
 			router := gin.Default()
