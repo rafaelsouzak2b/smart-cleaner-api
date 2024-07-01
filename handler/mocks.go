@@ -75,3 +75,25 @@ func (m *mockCleanerRepository) GetCleanerByEmailAndPassword(email, password str
 func (m *mockCleanerRepository) UpdateImgUrlCleaner(cleaner *schemas.Cleaner, location string) error {
 	return nil
 }
+
+type mockMessageRepository struct {
+	mock.Mock
+}
+
+func (m *mockMessageRepository) GetMessagesByCleanerId(cleanerID string) []schemas.Message {
+	args := m.Called(cleanerID)
+
+	if messages, ok := args.Get(0).([]schemas.Message); ok {
+		return messages
+	}
+	return []schemas.Message{}
+}
+
+func (m *mockMessageRepository) CreateMessage(message *schemas.Message) error {
+	args := m.Called(message)
+
+	if err, ok := args.Get(0).(error); ok {
+		return err
+	}
+	return nil
+}

@@ -5,12 +5,17 @@ import (
 	"gorm.io/gorm"
 )
 
+type IMessageRepositoryport interface {
+	GetMessagesByCleanerId(cleanerID string) []schemas.Message
+	CreateMessage(message *schemas.Message) error
+}
+
 type MessageRepository struct {
 	Db *gorm.DB
 }
 
-func NewMessageRepository(db *gorm.DB) MessageRepository {
-	return MessageRepository{
+func NewMessageRepository(db *gorm.DB) *MessageRepository {
+	return &MessageRepository{
 		Db: db,
 	}
 }

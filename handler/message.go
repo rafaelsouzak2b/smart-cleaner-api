@@ -10,9 +10,9 @@ import (
 	"github.com/guicazaroto/learning-go/util"
 )
 
-func GetMessageHandler(repository repository.MessageRepository) gin.HandlerFunc {
+func GetMessageHandler(repository repository.IMessageRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cleanerID := c.MustGet("id").(string)
+		cleanerID := c.GetString("id")
 
 		messages := repository.GetMessagesByCleanerId(cleanerID)
 
@@ -24,7 +24,7 @@ func GetMessageHandler(repository repository.MessageRepository) gin.HandlerFunc 
 	}
 }
 
-func CreateMessageHandler(repository repository.MessageRepository, repositoryCleaner repository.ICleanerRepositoryport) gin.HandlerFunc {
+func CreateMessageHandler(repository repository.IMessageRepositoryport, repositoryCleaner repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		request := model.MessageRequest{}
 		cleanerID := c.Param("id")

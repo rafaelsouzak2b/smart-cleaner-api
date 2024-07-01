@@ -71,9 +71,9 @@
 				
 				<option value="file7">github.com/guicazaroto/learning-go/handler/health.go (100.0%)</option>
 				
-				<option value="file8">github.com/guicazaroto/learning-go/handler/message.go (0.0%)</option>
+				<option value="file8">github.com/guicazaroto/learning-go/handler/message.go (100.0%)</option>
 				
-				<option value="file9">github.com/guicazaroto/learning-go/handler/mocks.go (89.7%)</option>
+				<option value="file9">github.com/guicazaroto/learning-go/handler/mocks.go (89.2%)</option>
 				
 				<option value="file10">github.com/guicazaroto/learning-go/main.go (0.0%)</option>
 				
@@ -731,45 +731,45 @@ import (
         "github.com/guicazaroto/learning-go/util"
 )
 
-func GetMessageHandler(repository repository.MessageRepository) gin.HandlerFunc <span class="cov0" title="0">{
-        return func(c *gin.Context) </span><span class="cov0" title="0">{
-                cleanerID := c.MustGet("id").(string)
+func GetMessageHandler(repository repository.IMessageRepositoryport) gin.HandlerFunc <span class="cov8" title="1">{
+        return func(c *gin.Context) </span><span class="cov8" title="1">{
+                cleanerID := c.GetString("id")
 
                 messages := repository.GetMessagesByCleanerId(cleanerID)
 
                 messagesResponse := []model.MessageResponse{}
-                for _, message := range messages </span><span class="cov0" title="0">{
+                for _, message := range messages </span><span class="cov8" title="1">{
                         messagesResponse = append(messagesResponse, message.ToResponse())
                 }</span>
-                <span class="cov0" title="0">util.SendSuccess(c, "get-all-messages", messagesResponse)</span>
+                <span class="cov8" title="1">util.SendSuccess(c, "get-all-messages", messagesResponse)</span>
         }
 }
 
-func CreateMessageHandler(repository repository.MessageRepository, repositoryCleaner repository.ICleanerRepositoryport) gin.HandlerFunc <span class="cov0" title="0">{
-        return func(c *gin.Context) </span><span class="cov0" title="0">{
+func CreateMessageHandler(repository repository.IMessageRepositoryport, repositoryCleaner repository.ICleanerRepositoryport) gin.HandlerFunc <span class="cov8" title="1">{
+        return func(c *gin.Context) </span><span class="cov8" title="1">{
                 request := model.MessageRequest{}
                 cleanerID := c.Param("id")
-                if err := c.BindJSON(&amp;request); err != nil </span><span class="cov0" title="0">{
+                if err := c.BindJSON(&amp;request); err != nil </span><span class="cov8" title="1">{
                         logger.Errorf("body error: %v", err.Error())
                         util.SendError(c, http.StatusBadRequest, err.Error())
                         return
                 }</span>
 
-                <span class="cov0" title="0">if err := request.Validate(); err != nil </span><span class="cov0" title="0">{
+                <span class="cov8" title="1">if err := request.Validate(); err != nil </span><span class="cov8" title="1">{
                         logger.Errorf("validation error: %v", err.Error())
                         util.SendError(c, http.StatusBadRequest, err.Error())
                         return
                 }</span>
 
-                <span class="cov0" title="0">cleaner := repositoryCleaner.GetCleanerById(cleanerID)
+                <span class="cov8" title="1">cleaner := repositoryCleaner.GetCleanerById(cleanerID)
 
                 //var cleaner schemas.Cleaner
-                if cleaner == nil </span><span class="cov0" title="0">{
+                if cleaner == nil </span><span class="cov8" title="1">{
                         util.SendError(c, http.StatusNotFound, "cleaner not found")
                         return
                 }</span>
 
-                <span class="cov0" title="0">message := schemas.Message{
+                <span class="cov8" title="1">message := schemas.Message{
                         CleanerId: cleaner.Id,
                         Message:   request.Message,
                         Telefone:  request.Telefone,
@@ -777,13 +777,13 @@ func CreateMessageHandler(repository repository.MessageRepository, repositoryCle
                         Email:     request.Email,
                 }
 
-                if err := repository.CreateMessage(&amp;message); err != nil </span><span class="cov0" title="0">{
+                if err := repository.CreateMessage(&amp;message); err != nil </span><span class="cov8" title="1">{
                         logger.Errorf("error creating opening: %v", err.Error())
                         util.SendError(c, http.StatusInternalServerError, "error creating opening on database")
                         return
                 }</span>
 
-                <span class="cov0" title="0">util.SendCreated(c, "create-cleaner-message", message.ToResponse())</span>
+                <span class="cov8" title="1">util.SendCreated(c, "create-cleaner-message", message.ToResponse())</span>
         }
 }
 </pre>
@@ -865,6 +865,28 @@ func (m *mockCleanerRepository) GetCleanerByEmailAndPassword(email, password str
 func (m *mockCleanerRepository) UpdateImgUrlCleaner(cleaner *schemas.Cleaner, location string) error <span class="cov0" title="0">{
         return nil
 }</span>
+
+type mockMessageRepository struct {
+        mock.Mock
+}
+
+func (m *mockMessageRepository) GetMessagesByCleanerId(cleanerID string) []schemas.Message <span class="cov8" title="1">{
+        args := m.Called(cleanerID)
+
+        if messages, ok := args.Get(0).([]schemas.Message); ok </span><span class="cov8" title="1">{
+                return messages
+        }</span>
+        <span class="cov0" title="0">return []schemas.Message{}</span>
+}
+
+func (m *mockMessageRepository) CreateMessage(message *schemas.Message) error <span class="cov8" title="1">{
+        args := m.Called(message)
+
+        if err, ok := args.Get(0).(error); ok </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
 </pre>
 		
 		<pre class="file" id="file10" style="display: none">package main
@@ -1080,12 +1102,17 @@ import (
         "gorm.io/gorm"
 )
 
+type IMessageRepositoryport interface {
+        GetMessagesByCleanerId(cleanerID string) []schemas.Message
+        CreateMessage(message *schemas.Message) error
+}
+
 type MessageRepository struct {
         Db *gorm.DB
 }
 
-func NewMessageRepository(db *gorm.DB) MessageRepository <span class="cov0" title="0">{
-        return MessageRepository{
+func NewMessageRepository(db *gorm.DB) *MessageRepository <span class="cov0" title="0">{
+        return &amp;MessageRepository{
                 Db: db,
         }
 }</span>

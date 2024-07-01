@@ -794,3 +794,294 @@ func TestCleanerHandler(t *testing.T) {
 		})
 	})
 }
+
+func TestMessageHandler(t *testing.T) {
+	t.Run("GetMessageHandler", func(t *testing.T) {
+		t.Run("Get messages", func(t *testing.T) {
+			resultMessagesMock := []schemas.Message{
+				{
+					Id:        1,
+					CleanerId: 1,
+					Cleaner: schemas.Cleaner{
+						Id:     1,
+						UserId: 1,
+						UserInfos: schemas.User{
+							Name:      "teste",
+							Email:     "teste@teste.com",
+							Password:  "cbcjdsb",
+							Role:      "cleaner",
+							Active:    true,
+							ImagemUrl: "ima_url",
+						},
+						Telefone:       "1254785",
+						CPF:            "1458574596",
+						DataNascimento: "2024-05-15T19:21:30+03:00",
+						Cep:            "1248522",
+						Logradouro:     "rua teste",
+						Numero:         "10",
+						Cidade:         "Teste",
+						Uf:             "tt",
+						Descricao:      "descricao teste",
+					},
+					Message:  "mensagem teste",
+					Telefone: "44851656",
+					Nome:     "nome teste",
+					Email:    "teste@teste.com",
+				},
+			}
+			router := gin.Default()
+			messageRepositoryMock := new(mockMessageRepository)
+			router.GET("/cleaner/message", GetMessageHandler(messageRepositoryMock))
+
+			messageRepositoryMock.On("GetMessagesByCleanerId", mock.Anything).Return(resultMessagesMock)
+
+			req, _ := http.NewRequest(http.MethodGet, "/cleaner/message", nil)
+			resp := httptest.NewRecorder()
+
+			router.ServeHTTP(resp, req)
+
+			type Response struct {
+				Data []model.MessageResponse
+			}
+
+			response := Response{}
+			json.Unmarshal([]byte(resp.Body.String()), &response)
+
+			assert.Equal(t, http.StatusOK, resp.Code)
+			assert.Len(t, response.Data, 1)
+
+		})
+
+		t.Run("Create a message", func(t *testing.T) {
+			resultCleanerMock := &schemas.Cleaner{
+				Id:     1,
+				UserId: 1,
+				UserInfos: schemas.User{
+					Name:      "teste",
+					Email:     "teste@teste.com",
+					Password:  "cbcjdsb",
+					Role:      "cleaner",
+					Active:    true,
+					ImagemUrl: "ima_url",
+				},
+				Telefone:       "1254785",
+				CPF:            "115165516",
+				DataNascimento: "2024-05-15T19:21:30+03:00",
+				Cep:            "1248522",
+				Logradouro:     "rua teste",
+				Numero:         "10",
+				Cidade:         "Teste",
+				Uf:             "tt",
+				Descricao:      "descricao teste",
+			}
+
+			cleanerID := "1"
+			request := model.MessageRequest{
+				Message:  "teste mensagem",
+				Telefone: "551531651",
+				Nome:     "nome teste",
+				Email:    "teste@teste.com",
+			}
+			router := gin.Default()
+			messageRepositoryMock := new(mockMessageRepository)
+			cleanerRepositoryMock := new(mockCleanerRepository)
+			router.POST("/cleaner/message/:id", CreateMessageHandler(messageRepositoryMock, cleanerRepositoryMock))
+
+			cleanerRepositoryMock.On("GetCleanerById", cleanerID).Return(resultCleanerMock)
+
+			messageRepositoryMock.On("CreateMessage", mock.Anything).Return(nil)
+
+			body, _ := json.Marshal(request)
+			req, _ := http.NewRequest(http.MethodPost, "/cleaner/message/"+cleanerID, bytes.NewBuffer(body))
+			resp := httptest.NewRecorder()
+
+			router.ServeHTTP(resp, req)
+
+			type Response struct {
+				Data model.MessageResponse
+			}
+
+			response := Response{}
+			json.Unmarshal([]byte(resp.Body.String()), &response)
+
+			assert.Equal(t, http.StatusCreated, resp.Code)
+			assert.Equal(t, request.Email, response.Data.Email)
+			assert.Equal(t, request.Message, response.Data.Message)
+			assert.Equal(t, request.Nome, response.Data.Nome)
+			assert.Equal(t, request.Telefone, response.Data.Telefone)
+
+		})
+
+		t.Run("Request json invalid", func(t *testing.T) {
+			resultCleanerMock := &schemas.Cleaner{
+				Id:     1,
+				UserId: 1,
+				UserInfos: schemas.User{
+					Name:      "teste",
+					Email:     "teste@teste.com",
+					Password:  "cbcjdsb",
+					Role:      "cleaner",
+					Active:    true,
+					ImagemUrl: "ima_url",
+				},
+				Telefone:       "1254785",
+				CPF:            "115165516",
+				DataNascimento: "2024-05-15T19:21:30+03:00",
+				Cep:            "1248522",
+				Logradouro:     "rua teste",
+				Numero:         "10",
+				Cidade:         "Teste",
+				Uf:             "tt",
+				Descricao:      "descricao teste",
+			}
+
+			cleanerID := "1"
+			request := `{
+				Message:  "teste mensagem",
+				Telefone: "551531651",
+				Nome:     "nome teste",
+				Email:    "teste@teste.com",
+			}`
+			router := gin.Default()
+			messageRepositoryMock := new(mockMessageRepository)
+			cleanerRepositoryMock := new(mockCleanerRepository)
+			router.POST("/cleaner/message/:id", CreateMessageHandler(messageRepositoryMock, cleanerRepositoryMock))
+
+			cleanerRepositoryMock.On("GetCleanerById", cleanerID).Return(resultCleanerMock)
+
+			messageRepositoryMock.On("CreateMessage", mock.Anything).Return(nil)
+
+			body, _ := json.Marshal(request)
+			req, _ := http.NewRequest(http.MethodPost, "/cleaner/message/"+cleanerID, bytes.NewBuffer(body))
+			resp := httptest.NewRecorder()
+
+			router.ServeHTTP(resp, req)
+
+			assert.Equal(t, http.StatusBadRequest, resp.Code)
+
+		})
+
+		t.Run("Invalid request json", func(t *testing.T) {
+			resultCleanerMock := &schemas.Cleaner{
+				Id:     1,
+				UserId: 1,
+				UserInfos: schemas.User{
+					Name:      "teste",
+					Email:     "teste@teste.com",
+					Password:  "cbcjdsb",
+					Role:      "cleaner",
+					Active:    true,
+					ImagemUrl: "ima_url",
+				},
+				Telefone:       "1254785",
+				CPF:            "115165516",
+				DataNascimento: "2024-05-15T19:21:30+03:00",
+				Cep:            "1248522",
+				Logradouro:     "rua teste",
+				Numero:         "10",
+				Cidade:         "Teste",
+				Uf:             "tt",
+				Descricao:      "descricao teste",
+			}
+
+			cleanerID := "1"
+			request := model.MessageRequest{
+				Message:  "",
+				Telefone: "551531651",
+				Nome:     "nome teste",
+				Email:    "teste@teste.com",
+			}
+			router := gin.Default()
+			messageRepositoryMock := new(mockMessageRepository)
+			cleanerRepositoryMock := new(mockCleanerRepository)
+			router.POST("/cleaner/message/:id", CreateMessageHandler(messageRepositoryMock, cleanerRepositoryMock))
+
+			cleanerRepositoryMock.On("GetCleanerById", cleanerID).Return(resultCleanerMock)
+
+			messageRepositoryMock.On("CreateMessage", mock.Anything).Return(nil)
+
+			body, _ := json.Marshal(request)
+			req, _ := http.NewRequest(http.MethodPost, "/cleaner/message/"+cleanerID, bytes.NewBuffer(body))
+			resp := httptest.NewRecorder()
+
+			router.ServeHTTP(resp, req)
+
+			assert.Equal(t, http.StatusBadRequest, resp.Code)
+		})
+
+		t.Run("Cleaner not found", func(t *testing.T) {
+			cleanerID := "1"
+			request := model.MessageRequest{
+				Message:  "teste mensagem",
+				Telefone: "551531651",
+				Nome:     "nome teste",
+				Email:    "teste@teste.com",
+			}
+			router := gin.Default()
+			messageRepositoryMock := new(mockMessageRepository)
+			cleanerRepositoryMock := new(mockCleanerRepository)
+			router.POST("/cleaner/message/:id", CreateMessageHandler(messageRepositoryMock, cleanerRepositoryMock))
+
+			cleanerRepositoryMock.On("GetCleanerById", cleanerID).Return(nil)
+
+			messageRepositoryMock.On("CreateMessage", mock.Anything).Return(nil)
+
+			body, _ := json.Marshal(request)
+			req, _ := http.NewRequest(http.MethodPost, "/cleaner/message/"+cleanerID, bytes.NewBuffer(body))
+			resp := httptest.NewRecorder()
+
+			router.ServeHTTP(resp, req)
+
+			assert.Equal(t, http.StatusNotFound, resp.Code)
+
+		})
+
+		t.Run("Create message erro", func(t *testing.T) {
+			resultCleanerMock := &schemas.Cleaner{
+				Id:     1,
+				UserId: 1,
+				UserInfos: schemas.User{
+					Name:      "teste",
+					Email:     "teste@teste.com",
+					Password:  "cbcjdsb",
+					Role:      "cleaner",
+					Active:    true,
+					ImagemUrl: "ima_url",
+				},
+				Telefone:       "1254785",
+				CPF:            "115165516",
+				DataNascimento: "2024-05-15T19:21:30+03:00",
+				Cep:            "1248522",
+				Logradouro:     "rua teste",
+				Numero:         "10",
+				Cidade:         "Teste",
+				Uf:             "tt",
+				Descricao:      "descricao teste",
+			}
+
+			cleanerID := "1"
+			request := model.MessageRequest{
+				Message:  "teste mensagem",
+				Telefone: "551531651",
+				Nome:     "nome teste",
+				Email:    "teste@teste.com",
+			}
+			router := gin.Default()
+			messageRepositoryMock := new(mockMessageRepository)
+			cleanerRepositoryMock := new(mockCleanerRepository)
+			router.POST("/cleaner/message/:id", CreateMessageHandler(messageRepositoryMock, cleanerRepositoryMock))
+
+			cleanerRepositoryMock.On("GetCleanerById", cleanerID).Return(resultCleanerMock)
+
+			messageRepositoryMock.On("CreateMessage", mock.Anything).Return(errors.New("erro ao salvar a mensagem"))
+
+			body, _ := json.Marshal(request)
+			req, _ := http.NewRequest(http.MethodPost, "/cleaner/message/"+cleanerID, bytes.NewBuffer(body))
+			resp := httptest.NewRecorder()
+
+			router.ServeHTTP(resp, req)
+
+			assert.Equal(t, http.StatusInternalServerError, resp.Code)
+		})
+	})
+}
