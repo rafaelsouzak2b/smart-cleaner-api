@@ -24,65 +24,75 @@ import (
 
 func GetCleanerHandler(repository repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "GetCleanerHandler", response)
+
 		city := c.Query("city")
 
 		cleaners := repository.GetCleaners(city)
 
 		if len(cleaners) == 0 {
-			util.SendError(c, http.StatusNotFound, "cleaners not found")
+			response = util.SendError(c, http.StatusNotFound, "cleaners not found")
 			return
 		}
 		cleanersResponse := []model.CleanerResponse{}
 		for _, cleaner := range cleaners {
 			cleanersResponse = append(cleanersResponse, cleaner.ToResponse())
 		}
-		util.SendSuccess(c, "get-all-cleaner", cleanersResponse)
+		response = util.SendSuccess(c, "get-all-cleaner", cleanersResponse)
 	}
 }
 
 func GetCleanerByIdHandler(repository repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "GetCleanerByIdHandler", response)
+
 		cleanerID := c.Param("id")
 		cleaner := repository.GetCleanerById(cleanerID)
 		if cleaner == nil {
-			util.SendError(c, http.StatusNotFound, "cleaner not found")
+			response = util.SendError(c, http.StatusNotFound, "cleaners not found")
 			return
 		}
-		util.SendSuccess(c, "get-cleaner-by-id", cleaner.ToResponse())
+		response = util.SendSuccess(c, "get-cleaner-by-id", cleaner.ToResponse())
 	}
 }
 
 func GetCleanerMeByIdHandler(repository repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "GetCleanerMeByIdHandler", response)
+
 		cleanerID := c.GetString("id")
 		cleaner := repository.GetCleanerById(cleanerID)
 		if cleaner == nil {
-			util.SendError(c, http.StatusNotFound, "cleaner not found")
+			response = util.SendError(c, http.StatusNotFound, "cleaners not found")
 			return
 		}
-		util.SendSuccess(c, "get-cleaner-me-by-id", cleaner.ToResponseMe())
+		response = util.SendSuccess(c, "get-cleaner-me-by-id", cleaner.ToResponseMe())
 	}
 }
 
 func CreateCleanerHandler(repository repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "CreateCleanerHandler", response)
+
 		request := model.CleanerRequest{}
 
 		if err := c.BindJSON(&request); err != nil {
-			logger.Errorf("body error: %v", err.Error())
-			util.SendError(c, http.StatusBadRequest, err.Error())
+			response = util.SendError(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		if err := request.Validate(); err != nil {
-			logger.Errorf("validation error: %v", err.Error())
-			util.SendError(c, http.StatusBadRequest, err.Error())
+			response = util.SendError(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		count := repository.GetCleanerByEmailAndCpf(request.Email, request.CPF)
 		if count > 0 {
-			util.SendError(c, http.StatusConflict, "already registered cleaner")
+			response = util.SendError(c, http.StatusConflict, "already registered cleaner")
 			return
 		}
 
@@ -106,28 +116,30 @@ func CreateCleanerHandler(repository repository.ICleanerRepositoryport) gin.Hand
 		}
 
 		if err := repository.CreateCleaner(&cleaner); err != nil {
-			logger.Errorf("error creating opening: %v", err.Error())
-			util.SendError(c, http.StatusInternalServerError, "error creating opening on database")
+			response = util.SendError(c, http.StatusInternalServerError, "error creating opening on database")
 			return
 		}
 
-		util.SendCreated(c, "create-cleaner", cleaner.ToResponse())
+		response = util.SendCreated(c, "create-cleaner", cleaner.ToResponse())
 	}
 }
 
 func UpdateCleanerHandler(repository repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "UpdateCleanerHandler", response)
+
 		request := model.CleanerRequest{}
 		cleanerID := c.GetString("id")
 
 		cleaner := repository.GetCleanerById(cleanerID)
 		if cleaner == nil {
-			util.SendError(c, http.StatusNotFound, "cleaner not found")
+			response = util.SendError(c, http.StatusNotFound, "cleaners not found")
 			return
 		}
 
 		if err := c.BindJSON(&request); err != nil {
-			util.SendError(c, http.StatusBadRequest, err.Error())
+			response = util.SendError(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -149,58 +161,64 @@ func UpdateCleanerHandler(repository repository.ICleanerRepositoryport) gin.Hand
 		cleaner.Uf = request.Uf
 
 		if err := repository.SaveCleaner(cleaner); err != nil {
-			util.SendError(c, http.StatusInternalServerError, err.Error())
+			response = util.SendError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
-		util.SendSuccess(c, "update-cleaner", cleaner.ToResponseMe())
+		response = util.SendSuccess(c, "update-cleaner", cleaner.ToResponseMe())
 	}
 }
 
 func DeleteCleanerHandler(repository repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "DeleteCleanerHandler", response)
+
 		cleanerID := c.GetString("id")
 		if err := repository.DeleteCleaner(cleanerID); err != nil {
-			util.SendError(c, http.StatusInternalServerError, err.Error())
+			response = util.SendError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
-		util.SendSuccess(c, "delete-cleaner", "Cleaner deleted successful")
+		response = util.SendSuccess(c, "delete-cleaner", "Cleaner deleted successful")
 	}
 }
 
 func SendImgProfileHandler(repository repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "SendImgProfileHandler", response)
+
 		cleanerID := c.Param("id")
 		cleaner := repository.GetCleanerById(cleanerID)
 		if cleaner == nil {
-			util.SendError(c, http.StatusNotFound, "cleaner not found")
+			response = util.SendError(c, http.StatusNotFound, "cleaners not found")
 			return
 		}
 		if cleaner.UserInfos.ImagemUrl != "" {
-			util.SendError(c, http.StatusBadRequest, "image already sent")
+			response = util.SendError(c, http.StatusBadRequest, "image already sent")
 			return
 		}
 		file, err := c.FormFile("file")
 		if err != nil {
-			util.SendError(c, http.StatusBadRequest, err.Error())
+			response = util.SendError(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		ext := strings.ToLower(filepath.Ext(file.Filename))
 
 		if !config.AllowedExtensions[ext] {
-			util.SendError(c, http.StatusBadRequest, fmt.Sprintf("file type not allowed: %s", ext))
+			response = util.SendError(c, http.StatusBadRequest, fmt.Sprintf("file type not allowed: %s", ext))
 			return
 		}
 
 		cfg, err := aws_config.LoadDefaultConfig(context.TODO(), aws_config.WithRegion(config.Environment.AwsRegion))
 		if err != nil {
-			util.SendError(c, http.StatusInternalServerError, err.Error())
+			response = util.SendError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		openedFile, err := file.Open()
 		if err != nil {
-			util.SendError(c, http.StatusInternalServerError, err.Error())
+			response = util.SendError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 		defer openedFile.Close()
@@ -218,48 +236,51 @@ func SendImgProfileHandler(repository repository.ICleanerRepositoryport) gin.Han
 		})
 
 		if err != nil {
-			util.SendError(c, http.StatusInternalServerError, err.Error())
+			response = util.SendError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 		if err := repository.UpdateImgUrlCleaner(cleaner, result.Location); err != nil {
-			util.SendError(c, http.StatusInternalServerError, err.Error())
+			response = util.SendError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		util.SendSuccess(c, "send-img-cleaner", gin.H{"message": "File uploaded successfully", "location": result.Location})
+		response = util.SendSuccess(c, "send-img-cleaner", gin.H{"message": "File uploaded successfully", "location": result.Location})
 	}
 }
 
 func UpdateImgProfileHandler(repository repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "UpdateImgProfileHandler", response)
+
 		cleanerID := c.GetString("id")
 		cleaner := repository.GetCleanerById(cleanerID)
 		if cleaner == nil {
-			util.SendError(c, http.StatusNotFound, "cleaner not found")
+			response = util.SendError(c, http.StatusNotFound, "cleaners not found")
 			return
 		}
 		file, err := c.FormFile("file")
 		if err != nil {
-			util.SendError(c, http.StatusBadRequest, err.Error())
+			response = util.SendError(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		ext := strings.ToLower(filepath.Ext(file.Filename))
 
 		if !config.AllowedExtensions[ext] {
-			util.SendError(c, http.StatusBadRequest, fmt.Sprintf("file type not allowed: %s", ext))
+			response = util.SendError(c, http.StatusBadRequest, fmt.Sprintf("file type not allowed: %s", ext))
 			return
 		}
 
 		cfg, err := aws_config.LoadDefaultConfig(context.TODO(), aws_config.WithRegion(config.Environment.AwsRegion))
 		if err != nil {
-			util.SendError(c, http.StatusInternalServerError, err.Error())
+			response = util.SendError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		openedFile, err := file.Open()
 		if err != nil {
-			util.SendError(c, http.StatusInternalServerError, err.Error())
+			response = util.SendError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 		defer openedFile.Close()
@@ -275,7 +296,7 @@ func UpdateImgProfileHandler(repository repository.ICleanerRepositoryport) gin.H
 				Key:    aws.String(fileName),
 			})
 			if err != nil {
-				util.SendError(c, http.StatusInternalServerError, err.Error())
+				response = util.SendError(c, http.StatusInternalServerError, err.Error())
 				return
 			}
 
@@ -285,7 +306,7 @@ func UpdateImgProfileHandler(repository repository.ICleanerRepositoryport) gin.H
 				Key:    aws.String(fileName),
 			}, *aws.Duration(time.Minute * 1))
 			if err != nil {
-				util.SendError(c, http.StatusInternalServerError, err.Error())
+				response = util.SendError(c, http.StatusInternalServerError, err.Error())
 				return
 			}
 
@@ -302,41 +323,44 @@ func UpdateImgProfileHandler(repository repository.ICleanerRepositoryport) gin.H
 		})
 
 		if err != nil {
-			util.SendError(c, http.StatusInternalServerError, err.Error())
+			response = util.SendError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		if err := repository.UpdateImgUrlCleaner(cleaner, result.Location); err != nil {
-			util.SendError(c, http.StatusInternalServerError, err.Error())
+			response = util.SendError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		util.SendSuccess(c, "update-img-cleaner", gin.H{"message": "File uploaded successfully", "location": result.Location})
+		response = util.SendSuccess(c, "update-img-cleaner", gin.H{"message": "File uploaded successfully", "location": result.Location})
 	}
 }
 
 func LoginCleanerHandler(repository repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "LoginCleanerHandler", response)
+
 		var creds struct {
 			Email    string `json:"email"`
 			Password string `json:"password"`
 		}
 		if err := c.BindJSON(&creds); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+			response = util.SendError(c, http.StatusBadRequest, "Invalid request")
 			return
 		}
 		cleaner := repository.GetCleanerByEmailAndPassword(creds.Email, creds.Password)
 		if cleaner == nil {
-			util.SendError(c, http.StatusUnauthorized, "Unauthorized")
+			response = util.SendError(c, http.StatusUnauthorized, "Unauthorized")
 			return
 		}
 
 		tokenString, err := config.GenerateJWT(fmt.Sprint(cleaner.Id), "cleaner")
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+			response = util.SendError(c, http.StatusInternalServerError, "Could not generate token")
 			return
 		}
-
-		c.JSON(http.StatusOK, gin.H{"token": tokenString})
+		response = gin.H{"token": tokenString}
+		c.JSON(http.StatusOK, response)
 	}
 }

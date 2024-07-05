@@ -12,6 +12,8 @@ import (
 
 func GetMessageHandler(repository repository.IMessageRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "GetMessageHandler", response)
 		cleanerID := c.GetString("id")
 
 		messages := repository.GetMessagesByCleanerId(cleanerID)
@@ -20,31 +22,32 @@ func GetMessageHandler(repository repository.IMessageRepositoryport) gin.Handler
 		for _, message := range messages {
 			messagesResponse = append(messagesResponse, message.ToResponse())
 		}
-		util.SendSuccess(c, "get-all-messages", messagesResponse)
+		response = util.SendSuccess(c, "get-all-messages", messagesResponse)
 	}
 }
 
 func CreateMessageHandler(repository repository.IMessageRepositoryport, repositoryCleaner repository.ICleanerRepositoryport) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response gin.H
+		defer util.CaptureResponse(c, "CreateMessageHandler", response)
 		request := model.MessageRequest{}
 		cleanerID := c.Param("id")
 		if err := c.BindJSON(&request); err != nil {
 			logger.Errorf("body error: %v", err.Error())
-			util.SendError(c, http.StatusBadRequest, err.Error())
+			response = util.SendError(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		if err := request.Validate(); err != nil {
 			logger.Errorf("validation error: %v", err.Error())
-			util.SendError(c, http.StatusBadRequest, err.Error())
+			response = util.SendError(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		cleaner := repositoryCleaner.GetCleanerById(cleanerID)
 
-		//var cleaner schemas.Cleaner
 		if cleaner == nil {
-			util.SendError(c, http.StatusNotFound, "cleaner not found")
+			response = util.SendError(c, http.StatusNotFound, "cleaner not found")
 			return
 		}
 
@@ -58,10 +61,10 @@ func CreateMessageHandler(repository repository.IMessageRepositoryport, reposito
 
 		if err := repository.CreateMessage(&message); err != nil {
 			logger.Errorf("error creating opening: %v", err.Error())
-			util.SendError(c, http.StatusInternalServerError, "error creating opening on database")
+			response = util.SendError(c, http.StatusInternalServerError, "error creating opening on database")
 			return
 		}
 
-		util.SendCreated(c, "create-cleaner-message", message.ToResponse())
+		response = util.SendCreated(c, "create-cleaner-message", message.ToResponse())
 	}
 }

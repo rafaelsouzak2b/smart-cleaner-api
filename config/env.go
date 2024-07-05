@@ -17,6 +17,8 @@ type environment struct {
 	AwsImgProfileBucket string `env:"AWS_IMG_PROFILE_BUCKET" required:"true"`
 	DefaultToken        string `env:"DEFAULT_TOKEN" required:"true"`
 	CleanerToken        string `env:"CLEANER_TOKEN" required:"true"`
+	Environment         string `env:"ENVIRONMENT" default:"development"`
+	SentryDns           string `env:"SENTRY_DNS"`
 }
 
 var Environment environment
